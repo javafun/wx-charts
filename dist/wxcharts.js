@@ -336,8 +336,6 @@ function getSeriesDataItem(series, index) {
     return data;
 }
 
-
-
 function getMaxTextListLength(list) {
     var lengthList = list.map(function (item) {
         return measureText(item);
@@ -849,6 +847,7 @@ function drawRadarLabel(angleList, radius, centerPosition, opts, config, context
 
 function drawPieText(series, opts, config, context, radius, center) {
     var lineRadius = radius + config.pieChartLinePadding;
+    var textRadius = lineRadius + config.pieChartTextPadding;
     var textObjectCollection = [];
     var lastTextObject = null;
 
@@ -1057,6 +1056,8 @@ function drawColumnDataPoints(series, opts, config, context) {
 
     var minRange = ranges.pop();
     var maxRange = ranges.shift();
+    var endY = opts.height - config.padding - config.xAxisHeight - config.legendHeight;
+
     context.save();
     if (opts._scrollDistance_ && opts._scrollDistance_ !== 0 && opts.enableScroll === true) {
         context.translate(opts._scrollDistance_, 0);
@@ -1286,8 +1287,6 @@ function drawToolTipBridge(opts, config, context, process) {
 function drawXAxis(categories, opts, config, context) {
     var _getXAxisPoints4 = getXAxisPoints(categories, opts, config),
         xAxisPoints = _getXAxisPoints4.xAxisPoints,
-        startX = _getXAxisPoints4.startX,
-        endX = _getXAxisPoints4.endX,
         eachSpacing = _getXAxisPoints4.eachSpacing;
 
     var startY = opts.height - config.padding - config.xAxisHeight - config.legendHeight;
@@ -1401,6 +1400,7 @@ function drawYAxis(series, opts, config, context) {
     var eachSpacing = Math.floor(spacingValid / config.yAxisSplit);
     var startX = config.padding + yAxisTotalWidth;
     var endX = opts.width - config.padding;
+    var startY = config.padding;
     var endY = opts.height - config.padding - config.xAxisHeight - config.legendHeight;
 
     // set YAxis background
@@ -1441,7 +1441,8 @@ function drawLegend(series, opts, config, context) {
     // legend margin top `config.padding`
 
     var _calLegendData = calLegendData(series, opts, config),
-        legendList = _calLegendData.legendList;
+        legendList = _calLegendData.legendList,
+        legendHeight = _calLegendData.legendHeight;
 
     var padding = 5;
     var marginTop = 8;
@@ -1910,7 +1911,7 @@ Event.prototype.trigger = function () {
 	}
 };
 
-var Charts = function Charts(opts) {
+var Charts = function Charts(opts, parentObj) {
     opts.title = opts.title || {};
     opts.subtitle = opts.subtitle || {};
     opts.yAxis = opts.yAxis || {};
@@ -1925,7 +1926,7 @@ var Charts = function Charts(opts) {
 
     this.opts = opts;
     this.config = config$$1;
-    this.context = wx.createCanvasContext(opts.canvasId);
+    this.context = wx.createCanvasContext(opts.canvasId, parentObj);
     // store calcuated chart data
     // such as chart point coordinate
     this.chartData = {};
